@@ -71,14 +71,108 @@ public class ChatClient extends AbstractClient
   {
     try
     {
-      sendToServer(message);
+    	if (message.startsWith("#")) {
+    		handleCommand(message); //Helper method to handle the commands typed by the client
+    	}
+    	else sendToServer(message);
     }
     catch(IOException e)
     {
       clientUI.display
-        ("Could not send message to server.  Terminating client.");
+        ("Could not send message to server. Terminating client.");
       quit();
     }
+  }
+  
+  /**
+   * This method helps the handleMessageFromClientUI(...) method            
+   * Defines what to do if a certain command has been typed
+   */
+  public void handleCommand(String command) throws IOException, NumberFormatException {
+	  if (command.equals("#quit")) {
+		  //#quit causes the client to terminate gracefully. Make sure the connection to the server is 
+		  //terminated before exiting the program.
+		  quit();
+	  }
+	  else if (command.equals("#logoff")) {
+		  //#logoff causes the client to disconnect from the server, but not quit.  
+		  try {
+			  closeConnection();
+    	  }
+    	  catch(IOException e) {
+    		  clientUI.display ("An error occured during log off, please try again.");
+    	  }
+	  }
+	  else if (command.startsWith("#sethost")) {
+		  //#sethost <host> calls the setHost method in the client. Only allowed if the client is logged 
+		  //off; displays an error message otherwise. 
+		  if (!isConnected()) { //Checks if the client is logged off
+			  String newHost=command.substring(8);
+			  newHost=newHost.trim();
+			  //There are no constraints to the name of the host
+			  setHost(newHost);
+			  clientUI.display("You set the new host to be: "+newHost);
+		  }
+		  else {
+			  clientUI.display
+			  ("You are already logged in. To set a new host, use the #logoff command to disconnect from the server.");
+		  }
+	  }
+      else if (command.startsWith("#setport")) {
+    	  //#setport <port> Calls the setPort method in the client, with the same constraints as #sethost, 
+    	  //however, port can only be an integer
+    	  if (!isConnected()) { //Checks if the client is logged off
+			  String newPort=command.substring(8);
+			  newPort=newPort.trim();
+			  int port;
+			  try {
+				  port=Integer.parseInt(newPort); //throws NumberFormatException
+				  setPort(port);
+				  clientUI.display("You set the new port to be: "+port);
+			  }catch(NumberFormatException ne) {
+				 clientUI.display
+				 (newPort+" is not an integer. To set a new port, please try again."); 
+			  }
+		  }
+		  else {
+			  clientUI.display
+			  ("You are already logged in. To set a new port, use the #logoff command to disconnect from the server.");
+		  }
+		  
+	  }
+      else if (command.equals("#login")) {
+    	  //#login causes the client to connect to the server. Only allowed if the client is not already 
+    	  //connected; displays an error message otherwise.
+    	  if (!isConnected()) {
+    		  try {
+    			  openConnection(); //throws IOException
+    		  }catch(IOException e) {
+    			  clientUI.display("An error occured during log in, please try again.");
+    		  }
+    	  }
+    	  else {
+    		  clientUI.display
+			  ("You are already logged in. To log in again, use the #logoff command beforehand.");
+    	  }  
+      }
+      else if (command.equals("#gethost")) {
+    	  //#gethost displays the current host name
+    	  clientUI.display("Current host name is: "+getHost());
+      }
+      else if (command.equals("#getport")) {
+    	  //#getport displays the current port number
+    	  clientUI.display("Current port number is: "+getPort());
+      }
+      else {
+    	  clientUI.display("Not a command.");
+    	  try {
+        	  sendToServer(command); //throws IOException
+    	  }
+    	  catch(IOException e) {
+    		  clientUI.display ("Could not send message to server. Terminating client.");
+    	      quit();
+    	  }
+      }
   }
   
   /**
