@@ -59,11 +59,10 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   { 
-	System.out.println("Message received: " + msg + " from " + client);
+	System.out.println("Message received: " + msg + " from " + client.getInfo(loginKey)+".");
 	String msgStr=(String) msg;
 	if (msgStr.startsWith("#login")) {
-		String loginID=msgStr.substring(6);
-		loginID.trim().toLowerCase();
+		String loginID=msgStr.substring(6).trim();
 		//Check if the client is already connected to the server
 		if (client.getInfo(loginKey)!=null) {
 			try {
@@ -90,6 +89,7 @@ public class EchoServer extends AbstractServer
 		}
 		else
 			client.setInfo(loginKey, loginID);
+		    System.out.println(loginID+" has logged on.");
 	} else {
 		String prefix=(String) client.getInfo(loginKey);
 	    this.sendToAllClients(prefix+": "+msg);
@@ -227,7 +227,7 @@ public class EchoServer extends AbstractServer
    **/
   @Override
   protected void clientConnected(ConnectionToClient client){
-	  System.out.println("New client "+client+" connected to the server");
+	  System.out.println("A new client has connected to the server.");
   }
   
   /**
