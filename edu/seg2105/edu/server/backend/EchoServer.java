@@ -252,7 +252,7 @@ public class EchoServer extends AbstractServer
    **/
   @Override
   synchronized protected void clientException(ConnectionToClient client, Throwable exception) {
-	  System.out.println(client.getInfo(loginKey)+"has disconnected unexpectedly: "+exception.getMessage());
+	  System.out.println(client.getInfo(loginKey)+" has disconnected unexpectedly: "+exception.getMessage());
 	  super.clientDisconnected(client); //Since we do not have access to the private instance clientConnections
   }
 }
