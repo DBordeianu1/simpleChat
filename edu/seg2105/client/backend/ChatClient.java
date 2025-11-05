@@ -73,8 +73,13 @@ public class ChatClient extends AbstractClient
   public void handleMessageFromClientUI(String message)
   {
     try
-    {
-    	if (message.startsWith("#")) {
+    {   //If #login is received at any other time, the server should send an error message 
+    	//back to the client and terminate the connection. Therefore, we do not have to 
+    	//verify if the client is connected to the server.
+    	if (message.startsWith("#login")) {
+    		sendToServer(message);
+    	}
+    	else if (message.startsWith("#")) {
     		handleCommand(message); //Helper method to handle the commands typed by the client
     	}
     	else sendToServer(message);
@@ -143,6 +148,7 @@ public class ChatClient extends AbstractClient
 		  }
 		  
 	  }
+	  /* do not need this anymore bc of the Exercise 3, Cliend Side, Part c), iv)
       else if (command.equals("#login")) {
     	  //#login causes the client to connect to the server. Only allowed if the client is not already 
     	  //connected; displays an error message otherwise.
@@ -158,6 +164,7 @@ public class ChatClient extends AbstractClient
     		  clientUI.display("An error occured during login, please try again.");
     	  }  
       }
+	  */
       else if (command.equals("#gethost")) {
     	  //#gethost displays the current host name
     	  clientUI.display("Current host name is: "+getHost());

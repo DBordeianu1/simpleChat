@@ -27,6 +27,13 @@ public class EchoServer extends AbstractServer
 	*/	
   ChatIF serverUI;
   
+  /**
+    * The type of key that we specified for the login of clients to the server.
+    * Advantage is that it avoids typo mistakes when reusing the methods getInfo
+    * and setInfo from ConnectionToClient. Also, we do not want it to be hard-coded.
+	*/
+  static String loginKey="loginID";
+  
   //Constructors ****************************************************
   
   /**
@@ -51,9 +58,42 @@ public class EchoServer extends AbstractServer
    */
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
-  {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+  { 
+	System.out.println("Message received: " + msg + " from " + client);
+	String msgStr=(String) msg;
+	if (msgStr.startsWith("#login")) {
+		String loginID=msgStr.substring(6);
+		loginID.trim().toLowerCase();
+		//Check if the client is already connected to the server
+		if (client.getInfo(loginKey)!=null) {
+			try {
+				client.sendToClient("Error: You are already connected to the server. Terminating the connection.");
+			}catch(IOException e) {
+				serverUI.display("An error occured: Could not send message to client");
+			}
+			try {
+				client.close();
+			}catch(IOException e) {
+				serverUI.display("An error occured: Could not disconnect client");
+			}
+			return;
+		}
+		//The loginID cannot be of length below 3 characters, close the client 
+		//if the condition is not met
+		if (loginID.length()<3) {
+			try {
+				client.sendToClient("Error: Login id should have a minimum length of 3.");
+				client.close(); //Closes the connection to the client
+			}catch(IOException e) {
+				serverUI.display("An error occured: Could not disconnect client");
+			}
+		}
+		else
+			client.setInfo(loginKey, loginID);
+	} else {
+		String prefix=(String) client.getInfo(loginKey);
+	    this.sendToAllClients(prefix+": "+msg);
+	} 
   }
   
   /**
@@ -95,7 +135,7 @@ public class EchoServer extends AbstractServer
 		  try {
 			  close(); //Disconnects all existing clients //throws IOException
 		  }catch(IOException e) {
-			  serverUI.display("An error occured: could not disconnect all existing clients. Try again.");
+			  serverUI.display("An error occured: Could not disconnect all existing clients. Try again.");
 		  }		  
 	  }
 	  else if(command.startsWith("#setport")) {
