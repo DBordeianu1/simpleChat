@@ -86,7 +86,7 @@ public class EchoServer extends AbstractServer
    * This method helps the handleMessageFromServerUI(...) method            
    * Defines what to do if a certain command has been typed
    */
-  public void handleCommand(String command) throws Exception, NumberFormatException{
+  public void handleCommand(String command) throws Exception, NumberFormatException, IOException{
 	  if (command.equals("#quit")) {
 		  //#quit causes the server to quit gracefully
 		  quit(); 
