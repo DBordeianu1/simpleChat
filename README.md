@@ -6,7 +6,7 @@
 
 
 
-This repository contains all the files of the SimpleChat application, which uses the OCSF Java Framework that is used to develop client-server systems.
+This repository contains all the files of the simpleChat application, which uses the OCSF Java Framework that is used to develop client-server systems.
 
 
 
