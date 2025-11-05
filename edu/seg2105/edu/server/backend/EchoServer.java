@@ -240,7 +240,7 @@ public class EchoServer extends AbstractServer
   synchronized protected void clientDisconnected(ConnectionToClient client) {
 		// Since we don't track which ID belongs to this client directly,
 		// remove by value.
-	  System.out.println("Client with loginID:"+client.getInfo(loginKey)+", disconnected from the server");
+	  System.out.println(client.getInfo(loginKey)+" has disconnected.");
 	  super.clientDisconnected(client); //Since we do not have access to the private instance clientConnections
 	}
   
@@ -252,7 +252,7 @@ public class EchoServer extends AbstractServer
    **/
   @Override
   synchronized protected void clientException(ConnectionToClient client, Throwable exception) {
-	  System.out.println("Client with loginID:"+client.getInfo(loginKey)+", disconnected unexpectedly from the server: "+exception.getMessage());
+	  System.out.println(client.getInfo(loginKey)+"has disconnected unexpectedly: "+exception.getMessage());
 	  super.clientDisconnected(client); //Since we do not have access to the private instance clientConnections
   }
 }
